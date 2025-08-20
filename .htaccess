@@ -1,0 +1,41 @@
+# CRB Checker Kenya - Apache Configuration
+# This file resolves 404 errors by properly routing requests
+
+# Enable URL rewriting
+RewriteEngine On
+
+# Set the base directory
+RewriteBase /
+
+# Prevent access to sensitive files
+RewriteRule ^(db\.php|error_log|\.env)$ - [F,L]
+
+# Handle existing files and directories
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Route all requests to appropriate PHP files
+RewriteRule ^([a-zA-Z0-9_-]+)$ $1.php [L,QSA]
+
+# Handle index requests
+RewriteRule ^$ index.php [L]
+
+# Handle API endpoints
+RewriteRule ^api/(.*)$ api/$1 [L,QSA]
+
+# Prevent directory listing
+Options -Indexes
+
+# Security headers
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options DENY
+    Header always set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# PHP settings
+<IfModule mod_php.c>
+    php_flag display_errors off
+    php_value upload_max_filesize 10M
+    php_value post_max_size 10M
+</IfModule>
